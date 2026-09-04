@@ -1,0 +1,53 @@
+<header class="topbar">
+  <a routerLink="/" class="brand">
+    <div class="logo">P</div>
+
+    <div class="brand-text">
+      <strong>Pedidos360</strong>
+      <span>Market</span>
+    </div>
+  </a>
+
+  <nav>
+    <a
+      routerLink="/"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      Inicio
+    </a>
+
+    <a *ngIf="loginDisplay" routerLink="/pedidos" routerLinkActive="active">
+      Mis pedidos
+    </a>
+
+    <div *ngIf="loginDisplay" class="user-info">
+      <div class="avatar">
+        {{ nombreUsuario.charAt(0) || 'U' }}
+      </div>
+
+      <span>{{ nombreUsuario }}</span>
+    </div>
+
+    <button *ngIf="!loginDisplay" class="login-button" (click)="login()">
+      Iniciar sesión
+    </button>
+
+    <button *ngIf="loginDisplay" class="logout-button" (click)="logout()">
+      Cerrar sesión
+    </button>
+  </nav>
+</header>
+
+<main class="main-container">
+  <router-outlet></router-outlet>
+</main>
+
+<footer>
+  <div>
+    <strong>Pedidos360</strong>
+    <p>Proyecto Desarrollo Cloud Native</p>
+  </div>
+
+  <span>Angular · MSAL · Spring Boot · JWT</span>
+</footer>

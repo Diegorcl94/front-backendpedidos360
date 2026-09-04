@@ -1,0 +1,146 @@
+<section class="orders-page">
+  <div class="orders-header">
+    <div>
+      <span class="secure">
+        🔒 ÁREA PROTEGIDA
+      </span>
+
+      <h1>Mis pedidos</h1>
+
+      <p>
+        Información obtenida desde el backend Spring Boot
+        mediante una solicitud autenticada.
+      </p>
+    </div>
+
+    <button class="reload" (click)="cargarPedidos()">
+      ↻ Actualizar
+    </button>
+  </div>
+
+  <!-- RESUMEN -->
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-icon">
+        📦
+      </div>
+
+      <div>
+        <span>Pedidos cargados</span>
+        <strong>{{ pedidos.length }}</strong>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon blue">
+        🔐
+      </div>
+
+      <div>
+        <span>Seguridad</span>
+        <strong>JWT</strong>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon green">
+        ☁️
+      </div>
+
+      <div>
+        <span>Backend</span>
+        <strong>Spring Boot</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARGA -->
+
+  <div *ngIf="cargando" class="message">
+    Cargando pedidos...
+  </div>
+
+  <!-- ERROR -->
+
+  <div *ngIf="error" class="error">
+    <strong>
+      No fue posible obtener los pedidos.
+    </strong>
+
+    <span>
+      {{ error }}
+    </span>
+  </div>
+
+  <!-- TABLA -->
+
+  <div *ngIf="!cargando && !error" class="orders-card">
+    <div class="table-header">
+      <div>
+        <h2>Historial de pedidos</h2>
+
+        <span>
+          Datos obtenidos desde la API
+        </span>
+      </div>
+
+      <span class="api-status">
+        ● API conectada
+      </span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Pedido</th>
+            <th>Cliente</th>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Total</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let pedido of pedidos">
+            <td>
+              <strong>
+                #{{ pedido.id }}
+              </strong>
+            </td>
+
+            <td>
+              {{ pedido.cliente }}
+            </td>
+
+            <td>
+              <div class="product-cell">
+                <div class="mini-product">
+                  📦
+                </div>
+
+                {{ pedido.producto }}
+              </div>
+            </td>
+
+            <td>
+              {{ pedido.cantidad }}
+            </td>
+
+            <td class="price">
+              ${{ pedido.total | number:'1.0-0' }}
+            </td>
+
+            <td>
+              <span class="estado">
+                {{ pedido.estado }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
