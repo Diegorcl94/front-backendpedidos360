@@ -57,7 +57,7 @@
 
   <!-- CARGA -->
 
-  <div *ngIf="cargando" class="message">
+  <div *ngIf="cargando && pedidos.length === 0" class="message">
     Cargando pedidos...
   </div>
 
@@ -75,7 +75,7 @@
 
   <!-- TABLA -->
 
-  <div *ngIf="!cargando && !error" class="orders-card">
+  <div *ngIf="!error && pedidos.length > 0" class="orders-card">
     <div class="table-header">
       <div>
         <h2>Historial de pedidos</h2>

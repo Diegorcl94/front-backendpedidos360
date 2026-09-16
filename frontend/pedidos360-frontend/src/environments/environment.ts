@@ -2,11 +2,12 @@ export const environment = {
   production: false,
 
   // Microsoft Entra ID
-  tenantId: 'REEMPLAZAR_TENANT_ID',
-  frontendClientId: 'REEMPLAZAR_FRONTEND_CLIENT_ID',
-  apiClientId: 'REEMPLAZAR_BACKEND_CLIENT_ID',
+  tenantId: 'bb5324af-c266-41ed-b36c-a971641c7af2',
 
-  // Local: http://localhost:8080
-  // AWS: reemplazar por la URL Invoke de API Gateway, sin slash final.
+  frontendClientId: 'cab56c31-45fc-463c-9b7b-0de70970cea6',
+
+  apiClientId: '07f91b77-8d9f-46a3-964f-5220af9bb815',
+
+  // Backend local
   apiBaseUrl: 'http://localhost:8080'
 };
