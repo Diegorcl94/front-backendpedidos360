@@ -8,6 +8,6 @@ export const environment = {
 
   apiClientId: '07f91b77-8d9f-46a3-964f-5220af9bb815',
 
-  // Backend local
-  apiBaseUrl: 'http://localhost:8080'
+  // Azure API Management
+  apiBaseUrl: 'https://pedidos360-apim-diego.azure-api.net/pedidos360'
 };
