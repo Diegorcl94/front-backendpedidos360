@@ -49,9 +49,8 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
-
     this.authService.logoutRedirect({
-      postLogoutRedirectUri: 'http://localhost:4200'
+      postLogoutRedirectUri: window.location.origin
     });
   }
 
