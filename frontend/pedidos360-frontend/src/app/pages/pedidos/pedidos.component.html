@@ -18,6 +18,128 @@
     </button>
   </div>
 
+  <!-- CREAR NUEVO PEDIDO -->
+
+  <section class="nuevo-pedido-section">
+
+    <div class="nuevo-pedido-actions">
+
+      <button
+        type="button"
+        class="btn-nuevo-pedido"
+        (click)="abrirFormulario()">
+
+        + Nuevo pedido
+
+      </button>
+
+    </div>
+
+    <div
+      *ngIf="mensaje"
+      class="pedido-exito"
+      role="status"
+      aria-live="polite">
+
+      <span class="pedido-exito-icono">✅</span>
+
+      <div>
+        <strong>¡Pedido creado correctamente!</strong>
+        <p>{{ mensaje }}</p>
+      </div>
+
+    </div>
+
+    <div *ngIf="mostrarFormulario" class="pedido-form-card">
+
+      <div class="pedido-form-header">
+        <h2>Crear nuevo pedido</h2>
+        <p>Registra una compra en Pedidos360.</p>
+      </div>
+
+      <form (ngSubmit)="crearPedido()">
+
+        <div class="pedido-form-grid">
+
+          <div class="pedido-field">
+            <label for="cliente">Cliente</label>
+
+            <input
+              id="cliente"
+              name="cliente"
+              type="text"
+              [(ngModel)]="nuevoPedido.cliente"
+              placeholder="Ej: Cliente Santiago"
+              required>
+          </div>
+
+          <div class="pedido-field">
+            <label for="producto">Producto</label>
+
+            <input
+              id="producto"
+              name="producto"
+              type="text"
+              [(ngModel)]="nuevoPedido.producto"
+              placeholder="Ej: Teclado mecánico"
+              required>
+          </div>
+
+          <div class="pedido-field">
+            <label for="cantidad">Cantidad</label>
+
+            <input
+              id="cantidad"
+              name="cantidad"
+              type="number"
+              min="1"
+              step="1"
+              [(ngModel)]="nuevoPedido.cantidad"
+              required>
+          </div>
+
+          <div class="pedido-field">
+            <label for="total">Total ($)</label>
+
+            <input
+              id="total"
+              name="total"
+              type="number"
+              min="1"
+              step="1"
+              [(ngModel)]="nuevoPedido.total"
+              required>
+          </div>
+
+        </div>
+
+        <div class="pedido-form-actions">
+
+          <button
+            type="button"
+            class="btn-cancelar"
+            [disabled]="guardando"
+            (click)="cerrarFormulario()">
+            Cancelar
+          </button>
+
+          <button
+            type="submit"
+            class="btn-guardar"
+            [disabled]="guardando">
+
+            {{ guardando ? 'Guardando...' : 'Crear pedido' }}
+
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </section>
+
   <!-- RESUMEN -->
 
   <div class="summary-grid">
@@ -65,7 +187,7 @@
 
   <div *ngIf="error" class="error">
     <strong>
-      No fue posible obtener los pedidos.
+      No fue posible completar la operación.
     </strong>
 
     <span>

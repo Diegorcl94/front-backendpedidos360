@@ -1,1 +1,14 @@
 frontend/pedidos360-frontend/src/oracleJdk-26/
+
+node_modules/
+.angular/
+target/
+oracleJdk-27/
+*.p12
+*.pfx
+*.pem
+.env
+.env.*
+*.log
+t/
+s

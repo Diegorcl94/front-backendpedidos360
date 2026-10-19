@@ -5,3 +5,15 @@
 *.log
 .env
 .DS_Store
+
+# Credenciales y material TLS locales (no versionar)
+.env.*
+/.local/
+/.local-tools/
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.truststore
+application-local.properties

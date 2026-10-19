@@ -21,4 +21,8 @@ export class PedidosService {
   listar(): Observable<Pedido[]> {
     return this.http.get<Pedido[]>(this.apiUrl);
   }
+
+  crear(pedido: Omit<Pedido, 'id'>): Observable<Pedido> {
+    return this.http.post<Pedido>(this.apiUrl, pedido);
+  }
 }

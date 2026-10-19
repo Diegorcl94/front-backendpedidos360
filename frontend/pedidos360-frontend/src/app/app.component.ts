@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { InteractionStatus } from '@azure/msal-browser';
 import { MsalBroadcastService, MsalService } from '@azure/msal-angular';
 import { Subject, filter, takeUntil } from 'rxjs';
-import { pedidosScope } from './auth-config';
+import { pedidosScopes } from './auth-config';
 
 @Component({
   standalone: false,
@@ -43,7 +43,7 @@ export class AppComponent implements OnInit, OnDestroy {
       scopes: [
         'openid',
         'profile',
-        pedidosScope
+        ...pedidosScopes
       ]
     });
   }

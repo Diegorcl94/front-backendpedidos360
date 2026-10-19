@@ -1,0 +1,383 @@
+{
+  "info": {
+    "name": "Pedidos360 Rabbit Admin - pruebas manuales",
+    "description": "Configurar adminApiKey como variable local secreta. Ejecutar solicitudes una a una; revisar DELETE antes de enviarlos. No contiene secretos.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "X-Admin-Api-Key",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "{{adminApiKey}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8082",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 Salud autenticada",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/admin/health",
+        "header": [],
+        "description": "Ejecutar manualmente. No se envían solicitudes adicionales desde los scripts."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 Crear cola durable",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/admin/queues",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "description": "Ejecutar manualmente. No se envían solicitudes adicionales desde los scripts.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"demo.evaluacion.queue\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 Crear exchange direct durable",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/admin/exchanges",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "description": "Ejecutar manualmente. No se envían solicitudes adicionales desde los scripts.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"demo.evaluacion.exchange\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 Crear binding - guardar capturas en Management antes de borrar",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/admin/bindings",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "description": "Ejecutar manualmente. No se envían solicitudes adicionales desde los scripts.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"queue\": \"demo.evaluacion.queue\",\n  \"exchange\": \"demo.evaluacion.exchange\",\n  \"routingKey\": \"demo.evaluacion\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 Nombre inválido",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/admin/queues",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "description": "Ejecutar manualmente. No se envían solicitudes adicionales desde los scripts.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"   \"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 Binding inválido",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/admin/bindings",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "description": "Ejecutar manualmente. No se envían solicitudes adicionales desde los scripts.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"queue\": \"demo.evaluacion.queue\",\n  \"exchange\": \"demo.evaluacion.exchange\",\n  \"routingKey\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 Cola duplicada - no modifica configuración",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/admin/queues",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "description": "Ejecutar manualmente. No se envían solicitudes adicionales desde los scripts.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"demo.evaluacion.queue\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 Protección pedidos.dlq - debe rechazar",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/api/admin/queues/pedidos.dlq",
+        "header": [],
+        "description": "Ejecutar manualmente. No se envían solicitudes adicionales desde los scripts."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 403\", function () { pm.response.to.have.status(403); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 Sin credencial administrativa",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/admin/health",
+        "header": [],
+        "description": "Ejecutar manualmente. No se envían solicitudes adicionales desde los scripts.",
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", function () { pm.response.to.have.status(401); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 MANUAL Eliminar binding de prueba",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/api/admin/bindings?queue=demo.evaluacion.queue&exchange=demo.evaluacion.exchange&routingKey=demo.evaluacion",
+        "header": [],
+        "description": "Ejecutar manualmente. No se envían solicitudes adicionales desde los scripts."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 204\", function () { pm.response.to.have.status(204); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 MANUAL Eliminar cola de prueba vacía",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/api/admin/queues/demo.evaluacion.queue",
+        "header": [],
+        "description": "Ejecutar manualmente. No se envían solicitudes adicionales desde los scripts."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 204\", function () { pm.response.to.have.status(204); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 MANUAL Eliminar exchange de prueba",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/api/admin/exchanges/demo.evaluacion.exchange",
+        "header": [],
+        "description": "Ejecutar manualmente. No se envían solicitudes adicionales desde los scripts."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 204\", function () { pm.response.to.have.status(204); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 Cola inexistente tras eliminación",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/api/admin/queues/demo.evaluacion.queue",
+        "header": [],
+        "description": "Ejecutar manualmente. No se envían solicitudes adicionales desde los scripts."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

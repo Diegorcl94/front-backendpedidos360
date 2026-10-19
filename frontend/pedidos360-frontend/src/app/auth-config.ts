@@ -10,7 +10,10 @@ import {
 } from '@azure/msal-angular';
 import { environment } from '../environments/environment';
 
-export const pedidosScope = `api://${environment.apiClientId}/Pedidos.Read`;
+export const pedidosScopes = [
+  `api://${environment.apiClientId}/Pedidos.Read`,
+  `api://${environment.apiClientId}/Pedidos.Write`
+];
 
 export function MSALInstanceFactory(): IPublicClientApplication {
   return new PublicClientApplication({
@@ -30,7 +33,7 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
   return {
     interactionType: InteractionType.Redirect,
     authRequest: {
-      scopes: [pedidosScope]
+      scopes: pedidosScopes
     },
     loginFailedRoute: '/'
   };
@@ -41,12 +44,12 @@ export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
 
   protectedResourceMap.set(
     `${environment.apiBaseUrl}/api/pedidos`,
-    [pedidosScope]
+    pedidosScopes
   );
 
   protectedResourceMap.set(
     `${environment.apiBaseUrl}/api/admin`,
-    [pedidosScope]
+    pedidosScopes
   );
 
   return {
