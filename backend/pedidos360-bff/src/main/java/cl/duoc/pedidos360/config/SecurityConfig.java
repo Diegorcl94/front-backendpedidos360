@@ -54,6 +54,10 @@ public class SecurityConfig {
                             .hasAuthority("SCOPE_Pedidos.Write")
                         .requestMatchers("/api/pedidos/**")
                             .hasAuthority("SCOPE_Pedidos.Read")
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/reportes/**",
+                                "/api/auditoria/**")
+                            .hasAuthority("SCOPE_Pedidos.Read")
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))

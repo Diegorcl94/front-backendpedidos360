@@ -1,7 +1,6 @@
 package cl.duoc.pedidos360.messaging;
 
 import cl.duoc.pedidos360.config.RabbitMQConfig;
-
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -19,15 +18,44 @@ public class PedidoProducer {
 
     public void publicarPedidoCreado(Long pedidoId) {
 
-        String mensaje = "Pedido creado: " + pedidoId;
+        // Notificaciones - Exchange Direct
+        publicar(
+                RabbitMQConfig.EXCHANGE,
+                RabbitMQConfig.ROUTING_KEY,
+                "Pedido creado: " + pedidoId,
+                "pedido-" + pedidoId + "-notificacion"
+        );
+
+        // Cocina - Exchange Topic
+        publicar(
+                RabbitMQConfig.TOPIC_EXCHANGE,
+                RabbitMQConfig.COCINA_KEY,
+                "Ticket de cocina para pedido: " + pedidoId,
+                "pedido-" + pedidoId + "-cocina"
+        );
+
+        // Facturación - Exchange Topic
+        publicar(
+                RabbitMQConfig.TOPIC_EXCHANGE,
+                RabbitMQConfig.FACTURACION_KEY,
+                "Comprobante para pedido: " + pedidoId,
+                "pedido-" + pedidoId + "-facturacion"
+        );
+    }
+
+    private void publicar(
+            String exchange,
+            String routingKey,
+            String mensaje,
+            String correlationId) {
 
         CorrelationData correlationData =
-                new CorrelationData("pedido-" + pedidoId);
+                new CorrelationData(correlationId);
 
         try {
             rabbitTemplate.convertAndSend(
-                    RabbitMQConfig.EXCHANGE,
-                    RabbitMQConfig.ROUTING_KEY,
+                    exchange,
+                    routingKey,
                     mensaje,
                     correlationData
             );
@@ -62,8 +90,7 @@ public class PedidoProducer {
 
         } catch (Exception e) {
             throw new IllegalStateException(
-                    "No se pudo confirmar la publicacion de "
-                    + mensaje, e
+                    "Error publicando: " + mensaje, e
             );
         }
     }

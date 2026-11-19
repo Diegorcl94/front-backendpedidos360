@@ -18,6 +18,8 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { InicioComponent } from './pages/inicio/inicio.component';
 import { PedidosComponent } from './pages/pedidos/pedidos.component';
+import { EstadisticasComponent } from './pages/estadisticas/estadisticas.component';
+import { KafkaAdminComponent } from './pages/kafka-admin/kafka-admin.component';
 import {
   MSALGuardConfigFactory,
   MSALInstanceFactory,
@@ -28,7 +30,9 @@ import {
   declarations: [
     AppComponent,
     InicioComponent,
-    PedidosComponent
+    PedidosComponent,
+    EstadisticasComponent,
+    KafkaAdminComponent
   ],
   imports: [
     BrowserModule,

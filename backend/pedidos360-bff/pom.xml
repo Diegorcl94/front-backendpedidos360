@@ -22,6 +22,12 @@
     </properties>
 
     <dependencies>
+        <!-- Comunicación con Kafka - EV3 -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+
         <!-- Comunicación con RabbitMQ -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

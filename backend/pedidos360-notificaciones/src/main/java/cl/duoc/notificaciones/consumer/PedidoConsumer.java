@@ -2,7 +2,6 @@ package cl.duoc.notificaciones.consumer;
 
 import com.rabbitmq.client.Channel;
 import java.io.IOException;
-
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
@@ -12,7 +11,11 @@ public class PedidoConsumer {
 
     private static final int MAX_INTENTOS = 3;
 
-    @RabbitListener(queues = "pedidos.notificaciones.queue")
+    @RabbitListener(queues = {
+            "pedidos.notificaciones.queue",
+            "pedidos.cocina.queue",
+            "pedidos.facturacion.queue"
+    })
     public void recibirPedido(
             String mensaje,
             Message message,
@@ -21,51 +24,66 @@ public class PedidoConsumer {
         long deliveryTag =
                 message.getMessageProperties().getDeliveryTag();
 
+        String cola =
+                message.getMessageProperties().getConsumerQueue();
+
         boolean procesado = false;
 
         for (int intento = 1; intento <= MAX_INTENTOS; intento++) {
 
             try {
                 System.out.println(
-                    "[CONSUMER] Intento " + intento
-                    + " de " + MAX_INTENTOS
-                    + ": " + mensaje
+                        "[CONSUMER] Cola: " + cola
+                        + " | Intento: " + intento
+                        + " | Mensaje: " + mensaje
                 );
 
-                // Error definitivo: mensaje invalido
-                if (mensaje.contains("ERROR_PRUEBA")) {
+                if (mensaje == null || mensaje.isBlank()
+                        || mensaje.contains("ERROR_PRUEBA")) {
                     throw new IllegalArgumentException(
-                        "Mensaje invalido de prueba"
+                            "Mensaje invalido de prueba"
                     );
                 }
 
-                // Error temporal simulado
                 if (mensaje.contains("ERROR_TEMPORAL")) {
                     throw new IllegalStateException(
-                        "Servicio temporalmente no disponible"
+                            "Servicio temporalmente no disponible"
                     );
                 }
 
-                System.out.println(
-                    "[CONSUMER] Procesamiento exitoso"
-                );
+                switch (cola) {
+                    case "pedidos.notificaciones.queue":
+                        System.out.println(
+                                "[NOTIFICACIONES] " + mensaje);
+                        break;
+
+                    case "pedidos.cocina.queue":
+                        System.out.println(
+                                "[COCINA] " + mensaje);
+                        break;
+
+                    case "pedidos.facturacion.queue":
+                        System.out.println(
+                                "[FACTURACION] " + mensaje);
+                        break;
+
+                    default:
+                        throw new IllegalArgumentException(
+                                "Cola desconocida");
+                }
 
                 procesado = true;
                 break;
 
             } catch (IllegalArgumentException error) {
-
                 System.err.println(
-                    "[ERROR DEFINITIVO] " + error.getMessage()
+                        "[ERROR DEFINITIVO] " + error.getMessage()
                 );
-
-                // No tiene sentido reintentar
                 break;
 
             } catch (IllegalStateException error) {
-
                 System.err.println(
-                    "[ERROR TEMPORAL] " + error.getMessage()
+                        "[ERROR TEMPORAL] " + error.getMessage()
                 );
 
                 if (intento < MAX_INTENTOS) {
@@ -80,19 +98,17 @@ public class PedidoConsumer {
         }
 
         if (procesado) {
-
             channel.basicAck(deliveryTag, false);
 
             System.out.println(
-                "[ACK] Mensaje confirmado correctamente."
+                    "[ACK] Mensaje procesado correctamente: " + cola
             );
 
         } else {
-
             channel.basicNack(deliveryTag, false, false);
 
             System.err.println(
-                "[NACK] Intentos agotados o mensaje invalido."
+                    "[NACK] Mensaje enviado a la DLQ: " + cola
             );
         }
     }

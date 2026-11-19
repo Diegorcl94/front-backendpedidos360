@@ -1,0 +1,136 @@
+name: pedidos360-kafka
+
+x-zookeeper-env: &zookeeper-env
+  ZOOKEEPER_CLIENT_PORT: 2181
+  ZOOKEEPER_TICK_TIME: 2000
+  ZOOKEEPER_INIT_LIMIT: 10
+  ZOOKEEPER_SYNC_LIMIT: 5
+  ZOOKEEPER_SERVERS: "zk1:2888:3888;zk2:2888:3888;zk3:2888:3888"
+  KAFKA_HEAP_OPTS: "-Xms128m -Xmx256m"
+
+x-kafka-env: &kafka-env
+  KAFKA_ZOOKEEPER_CONNECT: zk1:2181,zk2:2181,zk3:2181
+  KAFKA_LISTENERS: INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9092
+  KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+  KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+  KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+  KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+  KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+  KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+  KAFKA_MIN_INSYNC_REPLICAS: 2
+  KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+  KAFKA_NUM_PARTITIONS: 3
+  KAFKA_HEAP_OPTS: "-Xms256m -Xmx512m"
+
+services:
+
+  zk1:
+    image: confluentinc/cp-zookeeper:7.9.11
+    hostname: zk1
+    container_name: pedidos360-zk1
+    environment:
+      <<: *zookeeper-env
+      ZOOKEEPER_SERVER_ID: 1
+    volumes:
+      - zk1_data:/var/lib/zookeeper/data
+      - zk1_log:/var/lib/zookeeper/log
+
+  zk2:
+    image: confluentinc/cp-zookeeper:7.9.11
+    hostname: zk2
+    container_name: pedidos360-zk2
+    environment:
+      <<: *zookeeper-env
+      ZOOKEEPER_SERVER_ID: 2
+    volumes:
+      - zk2_data:/var/lib/zookeeper/data
+      - zk2_log:/var/lib/zookeeper/log
+
+  zk3:
+    image: confluentinc/cp-zookeeper:7.9.11
+    hostname: zk3
+    container_name: pedidos360-zk3
+    environment:
+      <<: *zookeeper-env
+      ZOOKEEPER_SERVER_ID: 3
+    volumes:
+      - zk3_data:/var/lib/zookeeper/data
+      - zk3_log:/var/lib/zookeeper/log
+
+  kafka1:
+    image: confluentinc/cp-kafka:7.9.11
+    hostname: kafka1
+    container_name: pedidos360-kafka1
+    depends_on:
+      - zk1
+      - zk2
+      - zk3
+    restart: on-failure
+    ports:
+      - "127.0.0.1:9092:9092"
+    environment:
+      <<: *kafka-env
+      KAFKA_BROKER_ID: 1
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:29092,EXTERNAL://localhost:9092
+    volumes:
+      - kafka1_data:/var/lib/kafka/data
+
+  kafka2:
+    image: confluentinc/cp-kafka:7.9.11
+    hostname: kafka2
+    container_name: pedidos360-kafka2
+    depends_on:
+      - zk1
+      - zk2
+      - zk3
+    restart: on-failure
+    ports:
+      - "127.0.0.1:9093:9092"
+    environment:
+      <<: *kafka-env
+      KAFKA_BROKER_ID: 2
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka2:29092,EXTERNAL://localhost:9093
+    volumes:
+      - kafka2_data:/var/lib/kafka/data
+
+  kafka3:
+    image: confluentinc/cp-kafka:7.9.11
+    hostname: kafka3
+    container_name: pedidos360-kafka3
+    depends_on:
+      - zk1
+      - zk2
+      - zk3
+    restart: on-failure
+    ports:
+      - "127.0.0.1:9094:9092"
+    environment:
+      <<: *kafka-env
+      KAFKA_BROKER_ID: 3
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka3:29092,EXTERNAL://localhost:9094
+    volumes:
+      - kafka3_data:/var/lib/kafka/data
+
+  kafka-ui:
+    image: ghcr.io/kafbat/kafka-ui:v1.5.0
+    container_name: pedidos360-kafka-ui
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+    ports:
+      - "127.0.0.1:8085:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: Pedidos360
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka1:29092,kafka2:29092,kafka3:29092
+
+volumes:
+  zk1_data:
+  zk1_log:
+  zk2_data:
+  zk2_log:
+  zk3_data:
+  zk3_log:
+  kafka1_data:
+  kafka2_data:
+  kafka3_data:

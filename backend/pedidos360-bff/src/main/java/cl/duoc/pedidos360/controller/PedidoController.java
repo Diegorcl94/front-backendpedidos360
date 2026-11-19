@@ -3,9 +3,11 @@ package cl.duoc.pedidos360.controller;
 import cl.duoc.pedidos360.model.Pedido;
 import cl.duoc.pedidos360.repository.PedidoRepository;
 import cl.duoc.pedidos360.messaging.PedidoProducer;
+import cl.duoc.pedidos360.messaging.KafkaProducer;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,25 +18,25 @@ public class PedidoController {
 
     private final PedidoRepository repository;
     private final PedidoProducer producer;
+    private final KafkaProducer kafkaProducer;
 
     public PedidoController(
             PedidoRepository repository,
-            PedidoProducer producer) {
+            PedidoProducer producer,
+            KafkaProducer kafkaProducer) {
 
         this.repository = repository;
         this.producer = producer;
+        this.kafkaProducer = kafkaProducer;
     }
 
-    // LISTAR PEDIDOS
     @GetMapping
     public List<Pedido> listar() {
         return repository.findAll();
     }
 
-    // BUSCAR PEDIDO POR ID
     @GetMapping("/{id}")
-    public ResponseEntity<Pedido> buscar(
-            @PathVariable Long id) {
+    public ResponseEntity<Pedido> buscar(@PathVariable Long id) {
 
         return repository.findById(id)
                 .map(ResponseEntity::ok)
@@ -42,18 +44,23 @@ public class PedidoController {
                         ResponseEntity.notFound().build());
     }
 
-    // CREAR PEDIDO Y PUBLICAR MENSAJE
     @PostMapping
     public ResponseEntity<Pedido> crear(
-            @RequestBody Pedido pedido) {
+            @RequestBody Pedido pedido,
+            Authentication authentication) {
 
         pedido.setId(null);
         pedido.setEstado("PENDIENTE");
 
         Pedido guardado = repository.save(pedido);
 
-        producer.publicarPedidoCreado(
-                guardado.getId()
+        // RabbitMQ - Evaluacion anterior
+        producer.publicarPedidoCreado(guardado.getId());
+
+        // Kafka - EV3
+        kafkaProducer.publicarPedidoCreado(
+                guardado,
+                authentication.getName()
         );
 
         return ResponseEntity

@@ -52,6 +52,31 @@ export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
     pedidosScopes
   );
 
+  protectedResourceMap.set(
+    `${environment.apiBaseUrl}/api/reportes/resumen`,
+    pedidosScopes
+  );
+
+  protectedResourceMap.set(
+    `${environment.apiBaseUrl}/api/auditoria/eventos`,
+    pedidosScopes
+  );
+
+  protectedResourceMap.set(
+    `${environment.apiBaseUrl}/api/admin/kafka/topics`,
+    pedidosScopes
+  );
+
+  protectedResourceMap.set(
+    `${environment.apiBaseUrl}/api/admin/kafka/topics/*`,
+    pedidosScopes
+  );
+
+  protectedResourceMap.set(
+    `${environment.apiBaseUrl}/api/admin/kafka/groups`,
+    pedidosScopes
+  );
+
   return {
     interactionType: InteractionType.Redirect,
     protectedResourceMap

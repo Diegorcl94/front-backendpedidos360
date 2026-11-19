@@ -21,6 +21,18 @@
       Mis pedidos
     </a>
 
+    <a *ngIf="loginDisplay"
+       routerLink="/estadisticas"
+       routerLinkActive="active">
+      Reportes y auditoría
+    </a>
+
+    <a *ngIf="loginDisplay"
+       routerLink="/kafka-admin"
+       routerLinkActive="active">
+      Kafka Admin
+    </a>
+
     <div *ngIf="loginDisplay" class="user-info">
       <div class="avatar">
         {{ nombreUsuario.charAt(0) || 'U' }}
